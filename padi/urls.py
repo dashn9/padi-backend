@@ -17,7 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+admin.site.site_header = "Padi Backend Administration"
+admin.site.index_title = "PADI"
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('auth/', include('authentication.api.urls'))
+    path("admin/", admin.site.urls),
+    # path('auth/', include('authentication.api.urls')),
+    path("artisans/", include("artisans.urls")),
+    path("auth/", include("djoser.urls")),
+    path("auth/", include("djoser.urls.jwt")),
+    path("auth/", include("authentication.urls")),
 ]
