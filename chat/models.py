@@ -13,7 +13,7 @@ class ChatMessage(models.Model):
         (GROUP_MESSAGE, "Group Message"),
     ]
 
-    # Room name, for DMs is technically unique by nature of the User ID(e.g. chat_1)
+    # Room name, for DMs it is technically unique by nature of the User ID(e.g. chat_1)
     room_name = models.CharField(null=True)
     # This is technically the user id, (If My.Padi has or will have the concept of groups, it will be uniquely generated for groups)
     recipient_room_id = models.CharField()

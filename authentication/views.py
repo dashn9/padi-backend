@@ -19,12 +19,12 @@ def check_email_verifiable(email):
     try:
         if get_user_model().objects.get(email=email).is_active:
             return Response(
-                {"detail": "You can't generate an OTP for this email"},
+                {"detail": "You can't generate/verify an OTP for this email"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
     except get_user_model().DoesNotExist:
         return Response(
-            {"detail": "You can't generate an OTP for this email"},
+            {"detail": "You can't generate/verify an OTP for this email"},
             status=status.HTTP_404_NOT_FOUND,
         )
     return True
@@ -91,7 +91,7 @@ def verify_otp_for_email_activation(request: Request):
         otp_instance = EmailOtpForVerification.objects.get(email=email)
     except EmailOtpForVerification.DoesNotExist:
         return Response(
-            {"detail": "You can't generate an OTP for this email"},
+            {"detail": "You can't verify an OTP for this email"},
             status=status.HTTP_404_NOT_FOUND,
         )
 
@@ -121,7 +121,8 @@ def verify_otp_for_email_activation(request: Request):
 
     if otp_instance.otp == otp:
         otp_instance.is_verified = True
-        get_user_model().objects.filter(email=email).update(is_active=True)
+        user = get_user_model().objects.filter(email=email)
+        user.update(is_active=True, activated_at=timezone.now())
         otp_instance.save()
         return Response(
             {"detail": "Email successfully verified"}, status=status.HTTP_200_OK

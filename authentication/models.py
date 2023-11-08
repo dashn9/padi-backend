@@ -45,6 +45,14 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
+class UserImage(models.Model):
+    user_id = models.BigIntegerField(null=False, blank=False)
+    image_location = models.CharField(max_length=255)
+    image = models.ImageField(upload_to=f"images/{user_id}/")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+# Create a celery task that automatically resolves inactive users to another db and deletes them from the main auth db
 class User(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
@@ -53,18 +61,11 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     email = models.EmailField(_("email address"), unique=True)
-    activated_at = models.DateTimeField(null=True)
+    activated_at = models.DateTimeField(null=True, default=None)
     phone_number = models.CharField(max_length=50, blank=True)
     ip_addresses = ArrayField(models.GenericIPAddressField())
 
     objects = UserManager()
-
-
-# This is a signal handler for updating the activated_at if is_active is set to true.
-@receiver(pre_save, sender=User)
-def set_activated_at(sender, instance, **kwargs):
-    if instance.is_active and not instance.activated_at:
-        instance.activated_at = timezone.now()
 
     class Meta:
         ordering = ["id"]

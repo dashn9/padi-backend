@@ -9,7 +9,7 @@ urlpatterns = [
     ),
     path(
         "otp/verify/user-activation",
-        views.generate_otp_for_email_activation,
+        views.verify_otp_for_email_activation,
         name="verify_otp_for_email_activation",
     ),
 ]

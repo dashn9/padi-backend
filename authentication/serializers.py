@@ -37,6 +37,16 @@ class UserCreateSerializer(BaseUserCreateSerializer):
         ]
 
     def validate(self, data):
+        # Accounts for the edge case where where last name might be blank, frontend protects against, at least, first name
+        if not data["last_name"]:
+            raise serializers.ValidationError(
+                {
+                    "full_name"
+                    if self.is_full_name
+                    else "last_name": "Last name is required."
+                }
+            )
+
         if " " in data["first_name"]:
             raise serializers.ValidationError(
                 {
@@ -54,6 +64,7 @@ class UserCreateSerializer(BaseUserCreateSerializer):
                     else "last_name": "Last name cannnot contain spaces."
                 }
             )
+
         return super().validate(data)
 
     def to_internal_value(self, data: Mapping):
@@ -64,6 +75,16 @@ class UserCreateSerializer(BaseUserCreateSerializer):
             if len(full_name_parts) >= 1:
                 data["first_name"] = full_name_parts[0]
                 data["last_name"] = " ".join(full_name_parts[1:])
+        # Accounts for the edge case where where last name might be blank, frontend protects against, at least, first name
+        if not data["last_name"]:
+            raise serializers.ValidationError(
+                {
+                    "full_name"
+                    if self.is_full_name
+                    else "last_name": "Last name is required."
+                }
+            )
+
         return super().to_internal_value(data)
 
     # I overrided this method so I could control the user data DRF CreateModelMixin returns after successfull User Registration
