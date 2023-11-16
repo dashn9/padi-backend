@@ -5,44 +5,75 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('authentication', '0001_initial'),
+        ("authentication", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Artisan',
+            name="Artisan",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('description', models.TextField()),
-                ('birth_date', models.DateField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("description", models.TextField()),
+                ("birth_date", models.DateField()),
             ],
         ),
         migrations.CreateModel(
-            name='Services',
+            name="Services",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50)),
             ],
         ),
         migrations.CreateModel(
-            name='Rating',
+            name="Rating",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('artisan_rating', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='artisans.artisan')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "artisan_rating",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="artisans.artisan",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='artisan',
-            name='services',
-            field=models.ManyToManyField(to='artisans.services'),
+            model_name="artisan",
+            name="services",
+            field=models.ManyToManyField(to="artisans.services"),
         ),
         migrations.AddField(
-            model_name='artisan',
-            name='user',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='authentication.user'),
+            model_name="artisan",
+            name="user",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE, to="authentication.user"
+            ),
         ),
     ]

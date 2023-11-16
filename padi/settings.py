@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "djoser",
     "rest_framework",
     "corsheaders",
+    "django_filters",
     # Internal apps
     "authentication",
     "artisans",
@@ -152,12 +153,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+    ),
 }
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(
-        minutes=5
+        days=30
     ),  # restore to minutes=5 when done testing
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "ROTATE_REFRESH_TOKENS": True,
