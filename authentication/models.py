@@ -2,12 +2,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
-
-from django.utils.crypto import get_random_string
-from django.utils import timezone
 
 
 # Add a logout endpoint to My.Padi, this is a todo
@@ -54,6 +49,46 @@ class UserImage(models.Model):
 
 # Create a celery task that automatically resolves inactive users to another db and deletes them from the main auth db
 class User(AbstractUser):
+    COUNTRY_CHOICES = [
+        ("NG", "Nigeria"),
+    ]
+    STATE_CHOICES = [
+        ("AB", "Abia"),
+        ("AD", "Adamawa"),
+        ("AK", "Akwa Ibom"),
+        ("AN", "Anambra"),
+        ("BA", "Bauchi"),
+        ("BE", "Benue"),
+        ("BO", "Borno"),
+        ("CR", "Cross River"),
+        ("DE", "Delta"),
+        ("EB", "Ebonyi"),
+        ("ED", "Edo"),
+        ("EK", "Ekiti"),
+        ("EN", "Enugu"),
+        ("FC", "Federal Capital Territory"),
+        ("GO", "Gombe"),
+        ("IM", "Imo"),
+        ("JI", "Jigawa"),
+        ("KA", "Kaduna"),
+        ("KE", "Kano"),
+        ("KO", "Kogi"),
+        ("KW", "Kwara"),
+        ("LG", "Lagos"),
+        ("NA", "Nasarawa"),
+        ("NI", "Niger"),
+        ("OG", "Ogun"),
+        ("ON", "Ondo"),
+        ("OS", "Osun"),
+        ("OY", "Oyo"),
+        ("PL", "Plateau"),
+        ("RI", "Rivers"),
+        ("SO", "Sokoto"),
+        ("TA", "Taraba"),
+        ("YO", "Yobe"),
+        ("ZA", "Zamfara"),
+    ]
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
@@ -61,6 +96,11 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     email = models.EmailField(_("email address"), unique=True)
+    birth_date = models.DateField(null=True, blank=True)
+    state = models.CharField(
+        max_length=2, choices=STATE_CHOICES, null=False, blank=False
+    )
+    country = models.CharField(max_length=2, choices=COUNTRY_CHOICES, default="NG")
     activated_at = models.DateTimeField(null=True, default=None)
     phone_number = models.CharField(max_length=50, blank=True)
     ip_addresses = ArrayField(models.GenericIPAddressField())
@@ -71,20 +111,5 @@ class User(AbstractUser):
         ordering = ["id"]
 
 
-class EmailOtpForVerification(models.Model):
-    email = models.EmailField(unique=True)
-    otp = models.CharField(max_length=12)
-    no_of_generation_tries = models.IntegerField(default=0)
-    no_of_verification_tries = models.IntegerField(default=0)
-    is_verified = models.BooleanField(default=False)
-    ip_addresses = ArrayField(models.GenericIPAddressField(), default=list)
-
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    updated_at = models.DateTimeField(null=True, blank=True)
-
-    def gen_otp(self):
-        self.otp = get_random_string(length=6, allowed_chars="0123456789")
-
-    def save(self, *args, **kwargs):
-        self.updated_at = timezone.now()
-        super(EmailOtpForVerification, self).save(*args, **kwargs)
+class UserGeolocation(models.Model):
+    pass

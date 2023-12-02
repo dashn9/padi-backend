@@ -65,13 +65,13 @@ class Command(BaseCommand):
                 email=faker.email(),
                 first_name=faker.first_name(),
                 last_name=faker.last_name(),
+                birth_date=faker.date_of_birth(minimum_age=18, maximum_age=65),
+                state=random.choice(get_user_model().STATE_CHOICES)[0],
                 ip_addresses=[faker.ipv4()],
             )
             artisan = Artisan(
                 user=user,
                 bio=faker.text(max_nb_chars=200),
-                birth_date=faker.date_of_birth(minimum_age=18, maximum_age=65),
-                state=random.choice(Artisan.STATE_CHOICES)[0],
             )
             artisan.save()
             artisan.services.add(self.__get_random_service())

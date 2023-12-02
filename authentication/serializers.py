@@ -4,7 +4,10 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer as BaseTokenObtainPairSerializer,
 )
-from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
+from djoser.serializers import (
+    UserCreateSerializer as BaseUserCreateSerializer,
+    UserSerializer as BaseUserSerializer,
+)
 
 
 def get_client_ip(request):
@@ -93,18 +96,27 @@ class UserCreateSerializer(BaseUserCreateSerializer):
         return {"first_name": data["first_name"], "email": data["email"]}
 
 
+class UserSerializer(BaseUserSerializer):
+    class Meta(BaseUserSerializer.Meta):
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+            "phone_number",
+            "state",
+            "birth_date",
+        ]
+        read_only_fields = ("first_name", "last_name")
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["state"] = instance.get_state_display()
+        return representation
+
+
 class TokenObtainPairSerializer(BaseTokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
         ## You can add more User model's attributes like username,email etc. in the data dictionary like this.
         update_user_ip(self.user, self.context["request"])
         return data
-
-
-class GenerateOtpForUserSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-
-
-class VerifyOtpForUserSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    otp = serializers.CharField(max_length=12)

@@ -1,13 +1,18 @@
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter
 
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Artisan, Service
-from .serializers import ArtisanSerializer, ArtisanSerializerLight, ServiceSerializer
+from .serializers import (
+    ArtisanSerializer,
+    ArtisanCreateSerializer,
+    ArtisanSerializerLight,
+    ServiceSerializer,
+)
 from .pagination import DefaultPagination
 from .filters import ArtisanCustomFilter
 
@@ -22,7 +27,7 @@ class ArtisanProfileViewSet(ReadOnlyModelViewSet):
 
     # One other way to acheive this will be to create a custom permission
     def get_permissions(self):
-        return [AllowAny()]
+        return [IsAuthenticated()]
 
     @action(methods=["GET", "PUT"], detail=False)
     def me(self, request):
@@ -31,10 +36,17 @@ class ArtisanProfileViewSet(ReadOnlyModelViewSet):
             serializer = ArtisanSerializer(artisan)
             return Response(serializer.data)
         elif request.method == "PUT":
-            serializer = ArtisanSerializer(artisan, data=request.data, partial=True)
+            serializer = ArtisanCreateSerializer(artisan, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
+    @action(methods=["GET"], detail=False)
+    def is_artisan(self, request):
+        profile_count = Artisan.objects.filter(user_id=request.user.id).count()
+        if profile_count == 1:
+            return Response(True)
+        return Response(False)
 
     def get_serializer_class(self):
         if self.action == "list":

@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-lrl*e_ae=v3j&7qb@ajd&tp28%17-w8f+hnb2j&p=yt^hs02pj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -48,9 +48,11 @@ INSTALLED_APPS = [
     "django_filters",
     # Internal apps
     "authentication",
+    "authenticator",
     "artisans",
     "customers",
     "chat",
+    "ratings",
 ]
 
 MIDDLEWARE = [
@@ -200,6 +202,7 @@ AUTH_USER_MODEL = "authentication.User"
 DJOSER = {
     "SERIALIZERS": {
         "user_create": "authentication.serializers.UserCreateSerializer",
+        "current_user": "authentication.serializers.UserSerializer",
     },
     "SEND_ACTIVATION_EMAIL": True,
     "ACTIVATION_URL": "",

@@ -5,4 +5,4 @@ from .models import Artisan
 class ArtisanCustomFilter(FilterSet):
     class Meta:
         model = Artisan
-        fields = {"services__service_code": ["in"], "state": ["exact"]}
+        fields = {"services__service_code": ["in"], "user__state": ["exact"]}

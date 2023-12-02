@@ -8,6 +8,7 @@ class Service(models.Model):
     service_name = models.CharField(max_length=100)
 
     service_group_name = models.CharField(max_length=100)
+    service_individual_name = models.CharField(max_length=100)
 
     icon_name = models.CharField(max_length=50)
     icon_color = models.CharField(max_length=7)
@@ -20,54 +21,17 @@ class Service(models.Model):
 
 
 class Artisan(models.Model):
-    COUNTRY_CHOICES = [
-        ("NG", "Nigeria"),
-    ]
-    STATE_CHOICES = [
-        ("AB", "Abia"),
-        ("AD", "Adamawa"),
-        ("AK", "Akwa Ibom"),
-        ("AN", "Anambra"),
-        ("BA", "Bauchi"),
-        ("BE", "Benue"),
-        ("BO", "Borno"),
-        ("CR", "Cross River"),
-        ("DE", "Delta"),
-        ("EB", "Ebonyi"),
-        ("ED", "Edo"),
-        ("EK", "Ekiti"),
-        ("EN", "Enugu"),
-        ("FC", "Federal Capital Territory"),
-        ("GO", "Gombe"),
-        ("IM", "Imo"),
-        ("JI", "Jigawa"),
-        ("KA", "Kaduna"),
-        ("KE", "Kano"),
-        ("KO", "Kogi"),
-        ("KW", "Kwara"),
-        ("LG", "Lagos"),
-        ("NA", "Nasarawa"),
-        ("NI", "Niger"),
-        ("OG", "Ogun"),
-        ("ON", "Ondo"),
-        ("OS", "Osun"),
-        ("OY", "Oyo"),
-        ("PL", "Plateau"),
-        ("RI", "Rivers"),
-        ("SO", "Sokoto"),
-        ("TA", "Taraba"),
-        ("YO", "Yobe"),
-        ("ZA", "Zamfara"),
-    ]
-
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     bio = models.TextField()
-    birth_date = models.DateField()
-    state = models.CharField(
-        max_length=2, choices=STATE_CHOICES, null=False, blank=False
-    )
-    country = models.CharField(max_length=2, choices=COUNTRY_CHOICES, default="NG")
-    services = models.ManyToManyField(Service)
+    # rename to ArtisanServices for more clarity
+    services = models.ManyToManyField(Service, through="ArtisanService")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+# Rename to ArtisanServices for more clarity, but be care full, do it when you are about to run a clean migration to the db
+# Also run the Artisan Services seeder command to reset table id before populating to prevent issues.
+class ArtisanService(models.Model):
+    service = models.ForeignKey(Service, on_delete=models.DO_NOTHING)
+    artisan = models.ForeignKey(Artisan, on_delete=models.DO_NOTHING)

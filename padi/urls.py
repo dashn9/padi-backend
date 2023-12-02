@@ -22,9 +22,9 @@ admin.site.index_title = "PADI"
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # path('auth/', include('authentication.api.urls')),
     path("artisans/", include("artisans.urls")),
+    path("ratings/", include("ratings.urls")),
     path("auth/", include("djoser.urls")),
     path("auth/", include("djoser.urls.jwt")),
-    path("auth/", include("authentication.urls")),
+    path("auth/", include("authenticator.urls")),
 ]

@@ -50,6 +50,7 @@ class Command(BaseCommand):
                 "icon_back_drop_color": "#FFF9E8",
                 "service_code": "ac_repair",
                 "service_name": "AC Repair",
+                "service_individual_name": "AC Repairer",
                 "service_group_name": "AC Repairers",
             },
             {
@@ -58,6 +59,7 @@ class Command(BaseCommand):
                 "icon_back_drop_color": "#F6F9FF",
                 "service_code": "electricity",
                 "service_name": "Electricity",
+                "service_individual_name": "Electerician",
                 "service_group_name": "Electericians",
             },
             {
@@ -66,6 +68,7 @@ class Command(BaseCommand):
                 "icon_back_drop_color": "#F5FFE9",
                 "service_code": "plumbing",
                 "service_name": "Plumbing",
+                "service_individual_name": "Plumber",
                 "service_group_name": "Plumbers",
             },
             {
@@ -74,6 +77,7 @@ class Command(BaseCommand):
                 "icon_back_drop_color": "#FBF6FF",
                 "service_code": "beauty",
                 "service_name": "Beauty",
+                "service_individual_name": "Beautician",
                 "service_group_name": "Beauticians",
             },
         ]
