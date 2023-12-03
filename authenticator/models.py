@@ -11,9 +11,10 @@ class EmailOtpAuthentication(models.Model):
 
     email = models.EmailField()
     otp = models.CharField(max_length=12)
+    no_of_generation_tries = models.IntegerField(default=0)
     no_of_verification_tries = models.IntegerField(default=0)
     action = models.CharField(choices=ACTIONS, null=False, blank=False)
-    payload = models.JSONField()
+    payload = models.JSONField(default=dict)
     used = models.BooleanField(default=False)
     ip_addresses = ArrayField(models.GenericIPAddressField(), default=list)
 

@@ -3,13 +3,13 @@ from . import views
 
 urlpatterns = [
     path(
-        "otp/generate/user-activation",
-        views.generate_otp_for_email_activation,
-        name="generate_otp_for_email_activation",
+        "otp/generate/",
+        views.generate_otp,
+        name="generate_otp",
     ),
     path(
-        "otp/verify/user-activation",
-        views.verify_otp_for_email_activation,
-        name="verify_otp_for_email_activation",
+        "otp/verify/",
+        views.verify_otp,
+        name="verify_otp",
     ),
 ]
