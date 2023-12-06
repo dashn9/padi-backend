@@ -14,6 +14,11 @@ class RoomTypes(Enum):
     APPLICATION_MESSAGE = "AM"  # Message sent by the server
 
 
+class MessageStatuses(Enum):
+    UNAUTHORIZED = 401
+    SUCCESS = 200
+
+
 class ReadReceipt(EmbeddedDocument):
     reader_id = IntField()
     read_timestamp = DateTimeField(null=True)
@@ -33,6 +38,7 @@ class ChatMessage(Document):
     message_type = EnumField(RoomTypes, default=RoomTypes.DIRECT_MESSAGE)
     sender_id = IntField()
     message_body = StringField(max_length=500)
+    status = EnumField(MessageStatuses)
     sender_timestamp = DateTimeField(null=True)
     timestamp = DateTimeField(default=datetime.datetime.utcnow)
     # Time the message was sent to the recipient

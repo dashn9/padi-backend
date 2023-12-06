@@ -1,4 +1,5 @@
 import json
+import datetime
 from asgiref.sync import sync_to_async
 
 from django.contrib.auth.models import AbstractBaseUser
@@ -6,7 +7,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
 from .serializers import ChatMessageSerializer
-from .models import RoomTypes as MessageTypes
+from .models import RoomTypes as MessageTypes, MessageStatuses
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -29,8 +30,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.send(
                 json.dumps(
                     {
-                        "error": "Invalid, Expired or Null Token",
-                        "detail": "You need to be authenticated to have access to this feature",
+                        "sender_id": "server",
+                        "message_type": MessageTypes.APPLICATION_MESSAGE.value,
+                        "status": MessageStatuses.UNAUTHORIZED.value,
+                        "message_body": "You need to be authenticated to have access to this feature",
+                        "sender_timestamp": datetime.datetime.utcnow().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
                     }
                 )
             )
