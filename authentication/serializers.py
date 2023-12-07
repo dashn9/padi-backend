@@ -96,7 +96,7 @@ class UserCreateSerializer(BaseUserCreateSerializer):
         return {"first_name": data["first_name"], "email": data["email"]}
 
 
-class UserSerializer(BaseUserSerializer):
+class CurrentUserSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         fields = [
             "first_name",
@@ -112,7 +112,14 @@ class UserSerializer(BaseUserSerializer):
         representation = super().to_representation(instance)
         representation["state"] = instance.get_state_display()
         return representation
-
+    
+class UserSerializer(BaseUserSerializer):
+    class Meta(BaseUserSerializer.Meta):
+        fields = [
+            "first_name",
+            "last_name",
+        ]
+        read_only_fields = ("first_name", "last_name")
 
 class TokenObtainPairSerializer(BaseTokenObtainPairSerializer):
     def validate(self, attrs):

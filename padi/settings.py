@@ -202,7 +202,11 @@ AUTH_USER_MODEL = "authentication.User"
 DJOSER = {
     "SERIALIZERS": {
         "user_create": "authentication.serializers.UserCreateSerializer",
-        "current_user": "authentication.serializers.UserSerializer",
+        "user": "authentication.serializers.UserSerializer",
+        "current_user": "authentication.serializers.CurrentUserSerializer",
+    },
+    "PERMISSIONS": {
+        'user': ['rest_framework.permissions.IsAuthenticated'],
     },
     "SEND_ACTIVATION_EMAIL": True,
     "ACTIVATION_URL": "",
