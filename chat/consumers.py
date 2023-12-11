@@ -1,5 +1,6 @@
 import json
 import datetime
+from dateutil import parser
 from asgiref.sync import sync_to_async
 
 from django.contrib.auth.models import AbstractBaseUser
@@ -81,7 +82,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         Return: None
         """
-        serializer.save()
+        return serializer.save()
 
     async def parse_message(self, text_data: str, send_error=True) -> dict | None:
         """This function uses the json module to parse the data sent by the client which is in string to a dictionary
@@ -117,16 +118,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
             bool: True, if message was successfully processed
         """
         message_serializer = ChatMessageSerializer(data=data)
-
         if not await sync_to_async(message_serializer.is_valid)():
             await self.send(json.dumps(message_serializer.errors))
             return False
         else:
             try:
-                await self.save_chat_message_serializer(message_serializer)
-                # Technically user_id(until group feature is probably added)
+                instance = await self.save_chat_message_serializer(message_serializer)
                 message = message_serializer.data
-                recipient_room_id = message.get("recipient_room_id")
+                print(message)
+                # Technically user_id(until group feature is probably added)
+                recipient_room_id = message.get("recipient_id")
                 # create message then send to channel group
                 # msg_obj = await self.create_message(message, sender, uuid)
 
@@ -134,8 +135,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     self.direct_message_name_identifier % recipient_room_id,
                     {
                         "type": "chat.message",
-                        "message": message.get("message_body"),
-                        "sender_id": message.get("sender"),
+                        "message_body": message.get("message_body"),
+                        "message_type": "DM",
+                        "status": 200,
+                        "sender_id": message.get("sender_id"),
+                        "sender_timestamp": instance.timestamp.utcnow().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
                         "sender_channel_name": self.channel_name,
                     },
                 )
@@ -190,23 +196,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
         data = await self.parse_message(text_data=text_data)
         # Attaches User ID to data to depict as the sender
         data["sender_id"] = user.id
+        data["sender_timestamp_offset"] = data["sender_timestamp"][-3:]
 
-        if data["recipient_room_id"] == "server":
+        if data["recipient_id"] == "server":
             await self.process_message_for_server(data)
         else:
             await self.process_message_for_client(data=data)
 
     async def chat_message(self, event):
+        print(event["sender_channel_name"])
         # ignore message if sent to self
         if self.channel_name != event["sender_channel_name"]:
-            print("does not match")
             await self.send(
                 json.dumps(
                     {
                         "type": "chat_message",
                         "data": {
-                            "message": event["message"],
+                            "message_body": event["message_body"],
                             "sender_id": event["sender_id"],
+                            "message_type": event["message_type"],
+                            "status": event["status"],
+                            "sender_timestamp": event["sender_timestamp"],
                         },
                     }
                 ),
