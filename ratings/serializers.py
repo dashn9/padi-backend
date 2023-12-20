@@ -30,3 +30,19 @@ class RatingSerializer(serializers.ModelSerializer):
             "rating_comment",
             "rating_stars_point",
         ]
+
+    def create(self, validated_data):
+        target = dict(
+            rating_giver=validated_data.get("rating_giver"),
+            rating_target_id=validated_data.get("rating_target_id"),
+            rating_target_type=validated_data.get("rating_target_type"),
+        )
+        defaults = dict(
+            rating_comment=validated_data.get("rating_comment"),
+            rating_stars_point=validated_data.get("rating_stars_point"),
+        )
+        print(target | defaults)
+        rating, created = self.Meta.model.objects.update_or_create(
+            **target, defaults=defaults
+        )
+        return rating

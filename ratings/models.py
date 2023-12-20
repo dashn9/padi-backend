@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 # Create your models here.
@@ -14,7 +15,11 @@ class Rating(models.Model):
     rating_target_type = models.CharField(max_length=100)
 
     rating_comment = models.TextField()
-    rating_stars_point = models.DecimalField(max_digits=2, decimal_places=1)
+    rating_stars_point = models.DecimalField(
+        max_digits=2,
+        decimal_places=1,
+        validators=[MaxValueValidator(100), MinValueValidator(1)],
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

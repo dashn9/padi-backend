@@ -9,5 +9,15 @@ urlpatterns = [
         RatingViewSet.as_view({"get": "list"}),
         name="rating-list",
     ),
-    path("", RatingViewSet.as_view({"post": "create"}), name="rating-create"),
+    path(
+        "me/<str:rating_target_type>/<int:rating_target_id>/",
+        RatingViewSet.as_view({"get": "me"}),
+        name="my-rating",
+    ),
+    path(
+        "aggregates/<str:rating_target_type>/<int:rating_target_id>/",
+        RatingViewSet.as_view({"get": "aggregates"}),
+        name="rating-aggregates",
+    ),
+    path("", RatingViewSet.as_view({"put": "create"}), name="rating-create"),
 ]

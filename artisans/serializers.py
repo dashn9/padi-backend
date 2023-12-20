@@ -41,6 +41,7 @@ class ArtisanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artisan
         fields = [
+            "id",
             "user_id",
             "first_name",
             "last_name",
