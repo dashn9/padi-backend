@@ -1,15 +1,17 @@
+from django.db import transaction
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter
+from rest_framework import status
 
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Artisan, Service
 from .serializers import (
     ArtisanSerializer,
-    ArtisanCreateSerializer,
+    ArtisanComposeSerializer,
     ArtisanSerializerLight,
     ServiceSerializer,
 )
@@ -29,17 +31,31 @@ class ArtisanProfileViewSet(ReadOnlyModelViewSet):
     def get_permissions(self):
         return [IsAuthenticated()]
 
-    @action(methods=["GET", "PUT"], detail=False)
+    # Figure out a better way to rewrite this me
+    @action(methods=["GET", "PUT", "PATCH"], detail=False)
+    @transaction.atomic
     def me(self, request):
-        (artisan, _) = Artisan.objects.get_or_create(user_id=request.user.id)
-        if request.method == "GET":
-            serializer = ArtisanSerializer(artisan)
-            return Response(serializer.data)
-        elif request.method == "PUT":
-            serializer = ArtisanCreateSerializer(artisan, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data)
+        try:
+            if request.method == "GET":
+                artisan = Artisan.objects.get(user_id=request.user.id)
+                serializer = ArtisanSerializer(artisan)
+                return Response(serializer.data)
+            elif request.method == "PUT":
+                data = request.data
+                data["user"] = request.user.id
+                artisan, created = Artisan.objects.get_or_create(
+                    user_id=request.user.id
+                )
+                serializer = ArtisanComposeSerializer(
+                    instance=artisan, data=data, partial=not created
+                )
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data)
+        except Artisan.DoesNotExist:
+            return Response(
+                {"detail": "Artisan profile does not exist"}, status.HTTP_404_NOT_FOUND
+            )
 
     @action(methods=["GET"], detail=False)
     def is_artisan(self, request):

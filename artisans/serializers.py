@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from .models import Artisan, Service
@@ -57,7 +58,11 @@ class ArtisanSerializer(serializers.ModelSerializer):
         return representation
 
 
-class ArtisanCreateSerializer(serializers.ModelSerializer):
+class ArtisanComposeSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        write_only=True, queryset=get_user_model().objects.all()
+    )
+    bio = serializers.CharField(required=True)
     services = serializers.SlugRelatedField(
         slug_field="service_code",
         queryset=Service.objects.all(),
@@ -67,8 +72,14 @@ class ArtisanCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artisan
         fields = [
+            "user",
             "bio",
+            "services",
         ]
+
+    def update(self, instance, validated_data):
+        validated_data.pop("user", None)
+        return super().update(instance, validated_data)
 
 
 class ArtisanSerializerLight(serializers.ModelSerializer):
